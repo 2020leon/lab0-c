@@ -55,15 +55,11 @@ struct list_head *q_new()
 /* Free all storage used by queue */
 void q_free(struct list_head *l)
 {
-    element_t *element;
+    element_t *i, *tmp;
     if (!l)
         return;
-    for (struct list_head *i = l->next, *next; i != l; i = next) {
-        element = list_entry(i, element_t, list);
-        /* `next` as a temporary variable to save the next `list_head` */
-        next = element->list.next;
-        q_release_element(element);
-    }
+    list_for_each_entry_safe (i, tmp, l, list)
+        q_release_element(i);
     free(l);
 }
 

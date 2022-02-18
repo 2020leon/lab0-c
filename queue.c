@@ -186,7 +186,7 @@ bool q_delete_dup(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
     struct list_head *i, *j;
-    if (!head || list_empty(head))
+    if (!head)
         return false;
     i = head->next;
     for (j = i->next; j != head; j = j->next) {

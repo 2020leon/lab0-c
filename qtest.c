@@ -762,6 +762,23 @@ static bool do_show(int argc, char *argv[])
     return show_queue(0);
 }
 
+static void q_shuffle(struct list_head *head)
+{
+    // Fisher-Yates shuffle
+    int size;
+    if (!head || list_empty(head))
+        return;
+    size = q_size(head);
+    for (struct list_head *i = head, *j; size > 0; i = j, size--) {
+        j = head->next;
+        for (int k = rand() % size; k > 0; k--)
+            j = j->next;
+        // Swap i->prev and j
+        list_move_tail(i->prev, j);
+        list_move_tail(j, i);
+    }
+}
+
 static void console_init()
 {
     ADD_COMMAND(new, "                | Create new queue");

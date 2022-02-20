@@ -47,6 +47,7 @@ static void log_access(int status,
                        http_request *req);
 #endif
 static void writen_header(int out_fd);
+static void writen_content(int out_fd, const char *content);
 
 void tiny_server_init()
 {
@@ -92,7 +93,7 @@ char *process(int fd, struct sockaddr_in *clientaddr)
     strncpy(ret, req.function_name, strlen(req.function_name) + 1);
 
     writen_header(fd);
-    writen(fd, req.function_name, strlen(req.function_name));
+    writen_content(fd, req.function_name);
     printf("web> %s\n", req.function_name);
 
     return ret;
@@ -283,7 +284,23 @@ static void writen_header(int out_fd)
     snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),
              "Cache-Control: no-cache\r\n");
     snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),
-             "Content-type: text/plain\r\n\r\n");
+             "Content-type: text/html\r\n\r\n");
 
+    writen(out_fd, buf, strlen(buf));
+}
+
+static void writen_content(int out_fd, const char *content)
+{
+    char buf[1024];
+    // Prevent browser sending favicon.ico request
+    snprintf(buf, sizeof(buf),
+             "<!DOCTYPE html>"
+             "<html>"
+             "<head>"
+             "<link rel=\"shortcut icon\" href=\"#\">"
+             "</head>"
+             "<body>%s</body>"
+             "</html>",
+             content);
     writen(out_fd, buf, strlen(buf));
 }

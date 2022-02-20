@@ -808,6 +808,7 @@ static bool do_web(int argc, char *argv[])
     if (listenfd == -1) {
         listenfd = get_listenfd();
         noise = false;
+        set_echo(false);
         return true;
     } else {
         report(1, "web server is already turned on");

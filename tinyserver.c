@@ -42,6 +42,22 @@ static ssize_t rio_readlineb(rio_t *rp, void *usrbuf, size_t maxlen);
 static ssize_t rio_read(rio_t *rp, char *usrbuf, size_t n);
 static void url_decode(char *src, char *dest, int max);
 static ssize_t writen(int fd, void *usrbuf, size_t n);
+static int open_listenfd(int port);
+
+int get_listenfd()
+{
+    int default_port = DEFAULT_PORT;
+
+    listenfd = open_listenfd(default_port);
+    if (listenfd > 0) {
+        printf("listen on port %d, fd is %d\n", default_port, listenfd);
+    } else {
+        perror("ERROR");
+        exit(listenfd);
+    }
+
+    return listenfd;
+}
 
 char *process(int fd, struct sockaddr_in *clientaddr)
 {
@@ -207,4 +223,40 @@ static ssize_t writen(int fd, void *usrbuf, size_t n)
         bufp += nwritten;
     }
     return n;
+}
+
+static int open_listenfd(int port)
+{
+    int _listenfd, optval = 1;
+    struct sockaddr_in serveraddr;
+
+    /* Create a socket descriptor */
+    if ((_listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        return -1;
+
+    /* Eliminates "Address already in use" error from bind. */
+    if (setsockopt(_listenfd, SOL_SOCKET, SO_REUSEADDR, (const void *) &optval,
+                   sizeof(int)) < 0)
+        return -1;
+
+    // 6 is TCP's protocol number
+    // enable this, much faster : 4000 req/s -> 17000 req/s
+    if (setsockopt(_listenfd, 6, TCP_CORK, (const void *) &optval,
+                   sizeof(int)) < 0)
+        return -1;
+
+    /* Listenfd will be an endpoint for all requests to port
+       on any IP address for this host */
+    memset(&serveraddr, 0, sizeof(serveraddr));
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serveraddr.sin_port = htons((unsigned short) port);
+    if (bind(_listenfd, (SA *) &serveraddr, sizeof(serveraddr)) < 0)
+        return -1;
+
+    /* Make it a listening socket ready to accept connection requests */
+    if (listen(_listenfd, LISTENQ) < 0)
+        return -1;
+
+    return _listenfd;
 }

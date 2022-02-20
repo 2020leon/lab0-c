@@ -8,6 +8,7 @@ extern bool noise;
 
 typedef struct sockaddr SA;
 
+int get_listenfd();
 char *process(int fd, struct sockaddr_in *clientaddr);
 
 #endif /* LAB0_TINYSERVER_H */

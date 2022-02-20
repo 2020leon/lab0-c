@@ -664,12 +664,15 @@ bool run_console(char *infile_name)
 
     if (!has_infile) {
         char *cmdline;
-        while ((cmdline = linenoise(prompt)) != NULL) {
+        while (noise && (cmdline = linenoise(prompt)) != NULL) {
             interpret_cmd(cmdline);
             linenoiseHistoryAdd(cmdline);       /* Add to the history. */
             linenoiseHistorySave(HISTORY_FILE); /* Save the history on disk. */
             linenoiseFree(cmdline);
         }
+        if (!noise)
+            while (!cmd_done())
+                cmd_select(0, NULL, NULL, NULL, NULL);
     } else {
         while (!cmd_done())
             cmd_select(0, NULL, NULL, NULL, NULL);

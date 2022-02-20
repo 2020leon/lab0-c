@@ -43,6 +43,11 @@ static ssize_t rio_read(rio_t *rp, char *usrbuf, size_t n);
 static void url_decode(char *src, char *dest, int max);
 static ssize_t writen(int fd, void *usrbuf, size_t n);
 static int open_listenfd(int port);
+#ifdef LOG_ACCESS
+static void log_access(int status,
+                       struct sockaddr_in *c_addr,
+                       http_request *req);
+#endif
 
 void tiny_server_init()
 {
@@ -82,7 +87,7 @@ char *process(int fd, struct sockaddr_in *clientaddr)
             *p = ' ';
     }
 #ifdef LOG_ACCESS
-    log_access(status, clientaddr, &req);
+    log_access(200, clientaddr, &req);
 #endif
     char *ret = malloc(strlen(req.function_name) + 1);
     strncpy(ret, req.function_name, strlen(req.function_name) + 1);
@@ -267,3 +272,14 @@ static int open_listenfd(int port)
 
     return _listenfd;
 }
+
+#ifdef LOG_ACCESS
+static void log_access(int status,
+                       struct sockaddr_in *c_addr,
+                       http_request *req)
+{
+    printf("%s:%d %d - '%s' (%s)\n", inet_ntoa(c_addr->sin_addr),
+           ntohs(c_addr->sin_port), status, req->filename,
+           get_mime_type(req->filename));
+}
+#endif

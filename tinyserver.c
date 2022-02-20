@@ -48,6 +48,7 @@ static void log_access(int status,
                        struct sockaddr_in *c_addr,
                        http_request *req);
 #endif
+static void writen_header(int out_fd);
 
 void tiny_server_init()
 {
@@ -91,6 +92,8 @@ char *process(int fd, struct sockaddr_in *clientaddr)
 #endif
     char *ret = malloc(strlen(req.function_name) + 1);
     strncpy(ret, req.function_name, strlen(req.function_name) + 1);
+
+    writen_header(fd);
     writen(fd, req.function_name, strlen(req.function_name));
     printf("web> %s\n", req.function_name);
 
@@ -283,3 +286,15 @@ static void log_access(int status,
            get_mime_type(req->filename));
 }
 #endif
+
+static void writen_header(int out_fd)
+{
+    char buf[256];
+    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\r\nAccept-Ranges: bytes\r\n");
+    snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),
+             "Cache-Control: no-cache\r\n");
+    snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),
+             "Content-type: text/plain\r\n\r\n");
+
+    writen(out_fd, buf, strlen(buf));
+}

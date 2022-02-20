@@ -32,8 +32,6 @@ typedef struct {
 
 typedef struct {
     char function_name[512];
-    off_t offset; /* for support Range */
-    size_t end;
 } http_request;
 
 static void parse_request(int fd, http_request *req);
@@ -104,8 +102,6 @@ static void parse_request(int fd, http_request *req)
 {
     rio_t rio;
     char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], format[64];
-    req->offset = 0;
-    req->end = 0; /* default */
 
     rio_readinitb(&rio, fd);
     rio_readlineb(&rio, buf, MAXLINE);
@@ -114,13 +110,6 @@ static void parse_request(int fd, http_request *req)
     /* read all */
     while (buf[0] != '\n' && buf[1] != '\n') { /* \n || \r\n */
         rio_readlineb(&rio, buf, MAXLINE);
-        if (buf[0] == 'R' && buf[1] == 'a' && buf[2] == 'n') {
-            sscanf(buf, "Range: bytes=%zu-%zu", &req->offset, &req->end);
-            // Range: [start, end]
-            if (req->end != 0) {
-                req->end++;
-            }
-        }
     }
     char *function_name = uri;
     if (uri[0] == '/') {

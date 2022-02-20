@@ -805,6 +805,8 @@ static bool do_web(int argc, char *argv[])
         report(1, "%s takes no arguments", argv[0]);
         return false;
     }
+    listenfd = get_listenfd();
+    noise = false;
     return true;
 }
 

@@ -805,9 +805,14 @@ static bool do_web(int argc, char *argv[])
         report(1, "%s takes no arguments", argv[0]);
         return false;
     }
-    listenfd = get_listenfd();
-    noise = false;
-    return true;
+    if (listenfd == -1) {
+        listenfd = get_listenfd();
+        noise = false;
+        return true;
+    } else {
+        report(1, "web server is already turned on");
+        return false;
+    }
 }
 
 static void console_init()

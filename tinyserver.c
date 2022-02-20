@@ -78,7 +78,7 @@ static void parse_request(int fd, http_request *req)
 
     rio_readinitb(&rio, fd);
     rio_readlineb(&rio, buf, MAXLINE);
-    snprintf(format, 64, "%%%ds %%%ds", MAXLINE, MAXLINE);
+    snprintf(format, 64, "%%%ds %%%ds", MAXLINE - 1, MAXLINE - 1);
     sscanf(buf, format, method, uri); /* version is not cared */
     /* read all */
     while (buf[0] != '\n' && buf[1] != '\n') { /* \n || \r\n */

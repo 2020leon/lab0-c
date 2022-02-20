@@ -1,7 +1,5 @@
 /* Implementation of simple command-line interface */
 
-#include "console.h"
-
 #include <ctype.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -14,8 +12,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
 #include "report.h"
+#include "tinyserver.h"
+
+#include "console.h"
 
 /* Some global values */
 int simulation = 0;
@@ -554,7 +554,13 @@ int cmd_select(int nfds,
 
         /* Add input fd to readset for select */
         infd = buf_stack->fd;
+        FD_ZERO(readfds);
         FD_SET(infd, readfds);
+
+        /* If web not ready listen */
+        if (listenfd != -1)
+            FD_SET(listenfd, readfds);
+
         if (infd == STDIN_FILENO && prompt_flag) {
             printf("%s", prompt);
             fflush(stdout);
@@ -563,6 +569,8 @@ int cmd_select(int nfds,
 
         if (infd >= nfds)
             nfds = infd + 1;
+        if (listenfd >= nfds)
+            nfds = listenfd + 1;
     }
     if (nfds == 0)
         return 0;
@@ -576,12 +584,23 @@ int cmd_select(int nfds,
         /* Commandline input available */
         FD_CLR(infd, readfds);
         result--;
-        if (has_infile) {
-            char *cmdline;
-            cmdline = readline();
-            if (cmdline)
-                interpret_cmd(cmdline);
-        }
+        char *cmdline;
+        cmdline = readline();
+        if (cmdline)
+            interpret_cmd(cmdline);
+    } else if (readfds && FD_ISSET(listenfd, readfds)) {
+        FD_CLR(listenfd, readfds);
+        result--;
+        int connfd;
+        struct sockaddr_in clientaddr;
+        socklen_t clientlen = sizeof(clientaddr);
+        connfd = accept(listenfd, (SA *) &clientaddr, &clientlen);
+
+        char *p = process(connfd, &clientaddr);
+        if (p)
+            interpret_cmd(p);
+        free(p);
+        close(connfd);
     }
     return result;
 }

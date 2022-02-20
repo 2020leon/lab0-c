@@ -74,6 +74,9 @@ static int string_length = MAXSTRING;
 #define MAX_RANDSTR_LEN 10
 static const char charset[] = "abcdefghijklmnopqrstuvwxyz";
 
+/* Kernel list_sort flag */
+static int kernelsort = 0;
+
 /* Forward declarations */
 static bool show_queue(int vlevel);
 
@@ -857,6 +860,7 @@ static void console_init()
               NULL);
     add_param("fail", &fail_limit,
               "Number of times allow queue operations to return false", NULL);
+    add_param("sort", &kernelsort, "Enable/disable kernel version sort", NULL);
 }
 
 /* Signal handlers */

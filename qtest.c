@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include "dudect/fixture.h"
 #include "list.h"
+#include "list_sort.h"
 #include "tinyserver.h"
 
 /* Our program needs to use regular malloc/free */
@@ -601,6 +602,14 @@ static bool do_size(int argc, char *argv[])
     return ok && !error_check();
 }
 
+static int list_cmp(void *_,
+                    const struct list_head *a,
+                    const struct list_head *b)
+{
+    return strcmp(list_entry(a, element_t, list)->value,
+                  list_entry(b, element_t, list)->value);
+}
+
 bool do_sort(int argc, char *argv[])
 {
     if (argc != 1) {
@@ -618,8 +627,12 @@ bool do_sort(int argc, char *argv[])
     error_check();
 
     set_noallocate_mode(true);
-    if (exception_setup(true))
-        q_sort(l_meta.l);
+    if (exception_setup(true)) {
+        if (kernelsort)
+            list_sort(NULL, l_meta.l, list_cmp);
+        else
+            q_sort(l_meta.l);
+    }
     exception_cancel();
     set_noallocate_mode(false);
 

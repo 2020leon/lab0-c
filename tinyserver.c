@@ -44,6 +44,13 @@ static void url_decode(char *src, char *dest, int max);
 static ssize_t writen(int fd, void *usrbuf, size_t n);
 static int open_listenfd(int port);
 
+void tiny_server_init()
+{
+    // Ignore SIGPIPE signal, so if browser cancels the request, it
+    // won't kill the whole process.
+    signal(SIGPIPE, SIG_IGN);
+}
+
 int get_listenfd()
 {
     int default_port = DEFAULT_PORT;

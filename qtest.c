@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include "dudect/fixture.h"
 #include "list.h"
+#include "tinyserver.h"
 
 /* Our program needs to use regular malloc/free */
 #define INTERNAL 1
@@ -990,6 +991,7 @@ int main(int argc, char *argv[])
     queue_init();
     init_cmd();
     console_init();
+    tiny_server_init();
 
     /* Trigger call back function(auto completion) */
     linenoiseSetCompletionCallback(completion);

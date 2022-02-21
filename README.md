@@ -170,3 +170,5 @@ External source code:
 * [dudect](https://github.com/oreparaz/dudect): public domain
 * [git-good-commit](https://github.com/tommarshall/git-good-commit): MIT License
 * [linenoise](https://github.com/antirez/linenoise): BSD 2-Clause "Simplified" License
+* [list_sort.c](https://github.com/torvalds/linux/blob/master/lib/list_sort.c): GPL-2.0
+* [list_sort.h](https://github.com/torvalds/linux/blob/master/include/linux/list_sort.h): GPL-2.0

@@ -46,9 +46,8 @@ struct list_head *q_new()
     /* Malloc queue. */
     struct list_head *const q = malloc(sizeof(struct list_head));
     /* Initialize queue if `q` is not NULL. */
-    if (!q)
-        return NULL;
-    INIT_LIST_HEAD(q);
+    if (q)
+        INIT_LIST_HEAD(q);
     return q;
 }
 

@@ -190,9 +190,8 @@ bool q_delete_dup(struct list_head *head)
         return false;
     i = head->next;
     for (j = i->next; j != head; j = j->next) {
-        if (strcmp(((element_t *) list_entry(i, element_t, list))->value,
-                   ((element_t *) list_entry(j, element_t, list))->value) ==
-            0) {
+        if (strcmp(list_entry(i, element_t, list)->value,
+                   list_entry(j, element_t, list)->value) == 0) {
             is_i_dup = true;
             // Remove j from the queue and release it
             q_release_element(my_q_remove(j, NULL, 0));
@@ -259,10 +258,8 @@ void q_sort(struct list_head *head)
     // Insert nodes in new_head to head
     i = head->next;
     for (j = new_head.next; !list_empty(&new_head); j = tmp) {
-        while (i != head &&
-               strcmp(((element_t *) list_entry(i, element_t, list))->value,
-                      ((element_t *) list_entry(j, element_t, list))->value) <
-                   0) {
+        while (i != head && strcmp(list_entry(i, element_t, list)->value,
+                                   list_entry(j, element_t, list)->value) < 0) {
             i = i->next;
         }
         if (i == head) {

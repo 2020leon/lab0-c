@@ -207,6 +207,8 @@ bool q_delete_dup(struct list_head *head)
             }
         }
     }
+    if (is_i_dup)
+        q_release_element(my_q_remove(i, NULL, 0));
     return true;
 }
 

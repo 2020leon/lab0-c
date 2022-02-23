@@ -772,6 +772,7 @@ static bool do_dm(int argc, char *argv[])
         ok = q_delete_mid(l_meta.l);
     exception_cancel();
 
+    lcnt--;
     show_queue(3);
     return ok && !error_check();
 }
@@ -1117,6 +1118,7 @@ int main(int argc, char *argv[])
     console_init();
     tiny_server_init();
 
+    /* Initialize linenoise only when infile_name not exist */
     if (!infile_name) {
         /* Trigger call back function(auto completion) */
         linenoiseSetCompletionCallback(completion);
@@ -1124,6 +1126,7 @@ int main(int argc, char *argv[])
         linenoiseHistorySetMaxLen(HISTORY_LEN);
         linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
     }
+
     set_verblevel(level);
     if (level > 1) {
         set_echo(true);
@@ -1135,6 +1138,8 @@ int main(int argc, char *argv[])
 
     bool ok = true;
     ok = ok && run_console(infile_name);
+
+    /* Do finish_cmd() before check whether ok is true or false */
     ok = finish_cmd() && ok;
 
     return ok ? 0 : 1;

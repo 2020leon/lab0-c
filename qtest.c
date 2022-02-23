@@ -1117,11 +1117,13 @@ int main(int argc, char *argv[])
     console_init();
     tiny_server_init();
 
-    /* Trigger call back function(auto completion) */
-    linenoiseSetCompletionCallback(completion);
+    if (!infile_name) {
+        /* Trigger call back function(auto completion) */
+        linenoiseSetCompletionCallback(completion);
 
-    linenoiseHistorySetMaxLen(HISTORY_LEN);
-    linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
+        linenoiseHistorySetMaxLen(HISTORY_LEN);
+        linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
+    }
     set_verblevel(level);
     if (level > 1) {
         set_echo(true);

@@ -669,6 +669,9 @@ bool run_console(char *infile_name)
             linenoiseHistoryAdd(cmdline);       /* Add to the history. */
             linenoiseHistorySave(HISTORY_FILE); /* Save the history on disk. */
             linenoiseFree(cmdline);
+            while (buf_stack->fd != STDIN_FILENO)
+                cmd_select(0, NULL, NULL, NULL, NULL);
+            has_infile = false;
         }
         if (!noise)
             while (!cmd_done())
